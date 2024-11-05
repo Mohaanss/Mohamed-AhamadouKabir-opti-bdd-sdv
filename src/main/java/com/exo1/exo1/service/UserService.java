@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
@@ -25,8 +26,8 @@ public class UserService {
     private ProjetRepository projetRepository;
     private UserMapper userMapper;
     
-    public List<UserDto> findAll() {
-        return userMapper.toDtos(userRepository.findAll());
+    public List<UserDto> findAll(Pageable pageable) {
+        return userMapper.toDtos(userRepository.findAll(pageable).getContent());
     }
     @Cacheable(value = "user", key = "#id")
     public UserDto findById(long id) {
