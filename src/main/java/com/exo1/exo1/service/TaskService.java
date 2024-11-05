@@ -2,7 +2,9 @@ package com.exo1.exo1.service;
 
 import com.exo1.exo1.dto.TaskDto;
 import com.exo1.exo1.entity.Task;
+import com.exo1.exo1.entity.TaskCountPerProject;
 import com.exo1.exo1.mapper.TaskMapper;
+import com.exo1.exo1.repository.TaskCountPerProjectRepository;
 import com.exo1.exo1.repository.TaskRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,7 @@ import java.util.List;
 public class TaskService {
     private TaskRepository taskRepository;
     private TaskMapper taskMapper;
-
+    private TaskCountPerProjectRepository taskCountPerProjectRepository;
     public List<TaskDto> findAll() {
         return taskMapper.toDtos(taskRepository.findAll());
     }
@@ -25,7 +27,10 @@ public class TaskService {
     }
 
     public TaskDto save(TaskDto taskDto) {
-        return taskMapper.toDto(taskRepository.save(taskMapper.toEntity(taskDto)));
+        TaskDto taskDtoResult =  taskMapper.toDto(taskRepository.save(taskMapper.toEntity(taskDto)));
+        taskCountPerProjectRepository.refreshMaterializedView();
+        return  taskDtoResult;
+
     }
 
     public TaskDto update(Long id, TaskDto taskDto) {

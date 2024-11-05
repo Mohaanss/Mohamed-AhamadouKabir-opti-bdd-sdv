@@ -7,6 +7,9 @@ import com.exo1.exo1.repository.ProjetRepository;
 import com.exo1.exo1.repository.TaskRepository;
 import com.exo1.exo1.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
@@ -25,7 +28,7 @@ public class UserService {
     public List<UserDto> findAll() {
         return userMapper.toDtos(userRepository.findAll());
     }
-
+    @Cacheable(value = "user", key = "#id")
     public UserDto findById(long id) {
         return userMapper.toDto(userRepository.findByIdWithTask(id).orElse(null));
     }
@@ -37,7 +40,7 @@ public class UserService {
                 });
         return userMapper.toDto(userRepository.save(user));
     }
-
+    @CachePut(value = "user", key = "#userDto.id")
     public UserDto update(Long id, UserDto userDto) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id " + id));
@@ -56,7 +59,7 @@ public class UserService {
         });
         return userMapper.toDto(userRepository.save(userUpdated));
     }
-
+    @CacheEvict(value = "user", key = "#id")
     public void delete(Long id) {
         userRepository.deleteById(id);
     }
